@@ -40,7 +40,7 @@ $('#submit').on('click', function(event){
 
 function databasePull(){
   database.ref().on('child_added', function(childSnapshot){
-    // console.log("test data pull", JSON.stringify(childSnapshot.val().trainData));
+    console.log("test data pull", JSON.stringify(childSnapshot.val()));
     let row = $('<tr>');
     let arrival = moment(childSnapshot.val().trainData.trainT, 'HH:mm').subtract(1, 'year');
     console.log("Train Arrival converted:", arrival);
@@ -62,9 +62,11 @@ function databasePull(){
     $(row).append('<td>' + freq + '</td>');
     $(row).append('<td>' + nextTrainTime + '</td>');
     $(row).append('<td>' + minTillTrain + '</td>');
-  })
+  }, function(errorObject) {
+      console.log("Errors handled: " + errorObject.code);
+    });
 }
 
-// setInterval(databasePull, 10000);
+// setInterval(databasePull, 5000);
 
 databasePull();
