@@ -11,6 +11,8 @@ firebase.initializeApp(config);
 
 const database = firebase.database();
 
+let currentTime = moment();
+
 let train = {
   name: "",
   dest: "",
@@ -36,12 +38,33 @@ $('#submit').on('click', function(event){
   addTrainData();
 })
 
-database.ref().on('child_added', function(childSnapshot){
-  console.log("test data pull", JSON.stringify(childSnapshot.val().trainData));
-  let row = $('<tr>');
-  $('.table').append(row);
-  $(row).append('<td>' + childSnapshot.val().trainData.name + '</td>')
-  $(row).append('<td>' + childSnapshot.val().trainData.dest + '</td>')
-  $(row).append('<td>' + childSnapshot.val().trainData.freq + '</td>')
-  $(row).append('<td>' + childSnapshot.val().trainData.trainT + '</td>')
-})
+function databasePull(){
+  database.ref().on('child_added', function(childSnapshot){
+    // console.log("test data pull", JSON.stringify(childSnapshot.val().trainData));
+    let row = $('<tr>');
+    let arrival = moment(childSnapshot.val().trainData.trainT, 'HH:mm').subtract(1, 'year');
+    console.log("Train Arrival converted:", arrival);
+    let freq = childSnapshot.val().trainData.freq;
+    console.log("Set train frequency",freq);
+    let differ = currentTime.diff(moment(arrival), "minutes");
+    console.log("Difference in minutes between current time and train:", differ);
+    let timeRemaining = differ % freq;
+    console.log("Time remaining:",timeRemaining);
+    let minTillTrain = freq - timeRemaining;
+    console.log("minutes till train", minTillTrain);
+    let nextTrain = moment().add(minTillTrain, "minutes");
+    console.log("next train:", nextTrain);
+    let nextTrainTime = (moment(nextTrain, 'minutes').format('h:mm A'));
+
+    $('.table').append(row);
+    $(row).append('<td>' + childSnapshot.val().trainData.name + '</td>');
+    $(row).append('<td>' + childSnapshot.val().trainData.dest + '</td>');
+    $(row).append('<td>' + freq + '</td>');
+    $(row).append('<td>' + nextTrainTime + '</td>');
+    $(row).append('<td>' + minTillTrain + '</td>');
+  })
+}
+
+// setInterval(databasePull, 10000);
+
+databasePull();
