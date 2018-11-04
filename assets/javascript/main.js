@@ -36,6 +36,10 @@ $('#submit').on('click', function(event){
   console.log("I'm clicked and calling addTrainData");
   event.preventDefault();
   addTrainData();
+  $('#trainInput').val('');
+  $('#destInput').val('');
+  $('#trainTinput').val('');
+  $('#freqInput').val('');
 })
 
 function databasePull(){
@@ -43,17 +47,17 @@ function databasePull(){
     console.log("test data pull", JSON.stringify(childSnapshot.val()));
     let row = $('<tr>');
     let arrival = moment(childSnapshot.val().trainData.trainT, 'HH:mm').subtract(1, 'year');
-    console.log("Train Arrival converted:", arrival);
+    // console.log("Train Arrival converted:", arrival);
     let freq = childSnapshot.val().trainData.freq;
-    console.log("Set train frequency",freq);
+    // console.log("Set train frequency",freq);
     let differ = currentTime.diff(moment(arrival), "minutes");
-    console.log("Difference in minutes between current time and train:", differ);
+    // console.log("Difference in minutes between current time and train:", differ);
     let timeRemaining = differ % freq;
-    console.log("Time remaining:",timeRemaining);
+    // console.log("Time remaining:",timeRemaining);
     let minTillTrain = freq - timeRemaining;
-    console.log("minutes till train", minTillTrain);
+    // console.log("minutes till train", minTillTrain);
     let nextTrain = moment().add(minTillTrain, "minutes");
-    console.log("next train:", nextTrain);
+    // console.log("next train:", nextTrain);
     let nextTrainTime = (moment(nextTrain, 'minutes').format('h:mm A'));
 
     $('.table').append(row);
